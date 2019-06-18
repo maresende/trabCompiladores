@@ -1,0 +1,13 @@
+let
+    var N := 8
+
+
+    var row := intArray [ N ] of 0
+    var col := intArray [ N ] of 0
+    var diag1 := intArray [N+N-1] of 0
+    var diag2 := intArray [N+N-1] of 0
+ 	   
+    type intArray = array of int
+
+ in 32
+end

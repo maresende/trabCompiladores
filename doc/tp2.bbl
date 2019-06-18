@@ -1,0 +1,15 @@
+\begin{thebibliography}{1}
+
+\bibitem{Slides}
+Roberto Bigonha, Mariza e~Bigonha.
+\newblock Compiladores, análise sintática.
+\newblock
+  \url{https://homepages.dcc.ufmg.br/~mariza/Cursos/CompiladoresI/Geral/Slides/SlidesPagComp/2019-1/comp-05-sintatica-p2.pdf}.
+\newblock Accessed: 2019-05-14.
+
+\bibitem{livrotexto}
+J~Ulman, AV~Aho, and R~Sethi.
+\newblock Compiler design: Principles, tools, and techniques.
+\newblock {\em Reading, Pearson Education Inc}, 1986.
+
+\end{thebibliography}

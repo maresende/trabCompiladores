@@ -1,0 +1,16 @@
+ 
+1) O JLex e o Java_Cup tem de estar corretamente instalados. E os
+diretorios incluidos no CLASSPATH.
+Exemplo de CLASSPATH valido :
+ 
+setenv CLASSPATH
+./:/home/prof/mariza/java/javacup:/home/prof/mariza/java:/usr/local/java/lib/classes.zip
+ 
+set path=($path /usr/local/java/bin)
+ 
+ 
+2) Por ultimo lembramos que Comentarios e Strings tem de ser
+implementados. Outra observacao importante eh
+que os caracteres tipo \n, \b, \t nao podem ser esquecidos senao
+problemas com alguns testes aparecerao.
+ 

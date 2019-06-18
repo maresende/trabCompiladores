@@ -1,0 +1,7 @@
+let 
+	function soma(x1: int, x2: int) : int = x1 + x2
+	var resultado : int := 0
+	var results_tring : string := "oloko"
+in
+	results_tring := soma(2, ufmg, 5)
+end

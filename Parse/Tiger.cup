@@ -1,0 +1,141 @@
+package Parse;
+
+import Tree2.Tree;
+import Tree2.Leaf;
+import java_cup.runtime.*;
+import ErrorMsg.ErrorMsg;
+import java.util.Stack;
+import java_cup.runtime.Symbol;
+import java_cup.runtime.lr_parser;
+
+parser code {:
+	Lexer lexer;
+	ErrorMsg error;
+	public static Tree ResultTree = new Tree();
+	public static void Resull(){
+		ResultTree.Print();
+	}
+	public Grm(Lexer lexer, ErrorMsg error){
+		this();
+		this.lexer = lexer;
+		this.error = error;
+	}
+	
+:}
+
+scan with {: 
+	Symbol aux = this.lexer.yylex();
+	return (aux!=null) ? aux : new Symbol(0); 
+:};
+
+terminal  String NUM;
+terminal  String SEMI, LPAR, RPAR, MINUS, PLUS, TIMES, DIVIDE, ASSIGN, BIGGER, SMALLER, EQUAL, BIGGER_EQUAL, SMALLER_EQUAL, DIFF, AND, OR, LBRA, RBRA, LKEY, RKEY, COLON, VIRG, DOT;
+terminal  String NIL, OF, IF, THEN, ELSE, WHILE, DO, FOR, TO, BREAK, LET, IN, END, TYPE, ARRAY_OF, VAR, FUNCTION;
+terminal  String ID, STRING, COMMENT;
+
+non terminal Leaf idbracs, exp, letexp, decs, idexps, ty, typeid, tyfields, tyfields1, expseq, expseq1, lvaluecont, args, args1;
+
+non terminal Leaf  exp1;
+
+precedence left LBRA, RBRA;
+precedence left LKEY, RKEY;
+precedence left LPAR, RPAR;
+precedence left ELSE;
+precedence left STRING;
+precedence left TIMES, DIVIDE;
+precedence left PLUS, MINUS;
+precedence left OR, AND, EQUAL, SMALLER, BIGGER, SMALLER_EQUAL, BIGGER_EQUAL, DIFF;
+
+start with exp1;
+
+exp1 ::= exp:e {: RESULT = new Leaf("exp1", "NULL"); RESULT.addChild(e); Grm.ResultTree.setRoot(RESULT); :}
+	;
+
+exp ::= letexp:e	{:	RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e); :}
+	| NIL:e 	{:	RESULT = new Leaf("exp", "NULL"); System.out.println(""); RESULT.addChild(new Leaf("NIL", e)); :}
+	| NUM:e		{:	RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("NUM", e)); :}
+	| STRING:e	{:	RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("STRING", e)); :}
+	| LPAR:e1 expseq:e2 RPAR:e3 {:	RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("LPAR", e1)); RESULT.addChild(e2); RESULT.addChild(new Leaf("RPAR",e3)); :}
+	| lvaluecont:e1 ASSIGN:e2 exp:e3	    {:	RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("ASSIGN", e2)); RESULT.addChild(e3); :}
+	| ID:e1 LPAR:e2 args:e3 RPAR:e4	{:	RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("ID", e1)); RESULT.addChild(new Leaf("LPAR", e2)); RESULT.addChild(e3); RESULT.addChild(new Leaf("RPAR",e4)); :}
+	| MINUS:e1 exp:e2	{:	RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("MINUS", e1)); RESULT.addChild(e2); :}
+	| exp:e1 TIMES:e2 exp:e3 	{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("TIMES",e2)); RESULT.addChild(e3); :}
+	| exp:e1 DIVIDE:e2 exp:e3	{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("DIVIDE",e2)); RESULT.addChild(e3); :}
+	| exp:e1 MINUS:e2 exp:e3		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("MINUS",e2)); RESULT.addChild(e3); :}
+	| exp:e1 PLUS:e2 exp:e3		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("PLUS",e2)); RESULT.addChild(e3); :}
+	| exp:e1 DIFF:e2 exp:e3 		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("DIFF",e2)); RESULT.addChild(e3); :}
+	| exp:e1 EQUAL:e2 exp:e3		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("EQUAL",e2)); RESULT.addChild(e3); :}
+	| exp:e1 SMALLER:e2 exp:e3	{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("SMALLER",e2)); RESULT.addChild(e3); :}
+	| exp:e1 BIGGER:e2 exp:e3	{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("BIGGER",e2)); RESULT.addChild(e3); :}
+	| exp:e1 SMALLER_EQUAL:e2 exp:e3		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("SMALLER_EQUAL",e2)); RESULT.addChild(e3); :}
+	| exp:e1 BIGGER_EQUAL:e2 exp:e3		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("BIGGER_EQUAL",e2)); RESULT.addChild(e3); :}
+	| exp:e1 AND:e2 exp:e3		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("AND",e2)); RESULT.addChild(e3); :}
+	| exp:e1 OR:e2 exp:e3		{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("OR",e2)); RESULT.addChild(e3); :}
+	| typeid:e1 LKEY:e2 ID:e3 EQUAL:e4 exp:e5 idexps:e6 RKEY:e7 {: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("LKEY",e2)); RESULT.addChild(new Leaf("ID", e3)); RESULT.addChild(new Leaf("EQUAL",e4)); RESULT.addChild(e5); RESULT.addChild(e6); RESULT.addChild(new Leaf("RKEY", e7));  :}	
+	| idbracs:e1 OF:e2 exp:e3 {: RESULT = new Leaf("exp","NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("OF", e2)); RESULT.addChild(e3); :}
+	| WHILE:e1 exp:e2 DO:e3 exp:e4	{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("WHILE", e1)); RESULT.addChild(e2); RESULT.addChild(new Leaf("DO",e3)); RESULT.addChild(e4); :}
+	| FOR:e1 ID:e2 ASSIGN:e3 exp:e4 TO:e5 exp:e6 DO:e7 exp:e8	{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("FOR", "NULL")); RESULT.addChild(new Leaf("ID",e2)); RESULT.addChild(new Leaf("ASSIGN", e3)); RESULT.addChild(e4); RESULT.addChild(new Leaf("TO",e5)); RESULT.addChild(e6); RESULT.addChild(new Leaf("DO", e7)); RESULT.addChild(e8);  :}	
+	| BREAK:e {: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("BREAK", e)); :}
+	| COMMENT exp:e	{: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e); :}
+	| IF:e1 exp:e2 THEN:e3 exp:e4 {: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("IF", e1)); RESULT.addChild(e2); RESULT.addChild(new Leaf("THEN",e3)); RESULT.addChild(e4); :}
+	| IF:e1 exp:e2 THEN:e3 exp:e4 ELSE:e5 exp:e6 {: RESULT = new Leaf("exp", "NULL"); RESULT.addChild(new Leaf("IF", e1)); RESULT.addChild(e2); RESULT.addChild(new Leaf("THEN",e3)); RESULT.addChild(e4); RESULT.addChild(new Leaf("ELSE",e5)); RESULT.addChild(e6); :}
+	| lvaluecont:e {:RESULT = new Leaf("exp", "NULL"); RESULT.addChild(e); :}
+	;
+
+args ::= exp:e1 args1:e2 {: RESULT = new Leaf("args", "NULL"); RESULT.addChild(e1); RESULT.addChild(e2); :}
+	|	{: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
+
+args1 ::= VIRG:e1 exp:e2 args1:e3 {: RESULT =  new Leaf("args1", "NULL"); RESULT.addChild(e2); RESULT.addChild(e3); :}
+	|  {: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
+
+idbracs ::= ID:e1 LBRA:e2 exp:e3 RBRA:e4 {: RESULT = new Leaf("idbracs", "NULL"); RESULT.addChild(new Leaf("LBRA", e2)); RESULT.addChild(e3); RESULT.addChild(new Leaf("RBRA", e4)); :}
+	;
+
+lvaluecont ::= lvaluecont:e1 DOT:e2 ID:e3 {: RESULT = new Leaf("lvaluecont", "NULL"); RESULT.addChild(e1); RESULT.addChild(new Leaf("DOT",e2)); RESULT.addChild(new Leaf("ID", e3)); :}
+	|      ID:e1 LBRA:e2 exp:e3 RBRA:e4 {: RESULT = new Leaf("lvaluecont", "NULL"); RESULT.addChild(new Leaf("LBRA", e2)); RESULT.addChild(e3); RESULT.addChild(new Leaf("RBRA", e4)); :}
+	|      ID:e	{: RESULT = new Leaf("lvaluecont","NULL"); RESULT.addChild(new Leaf("ID",e)); :}
+	;
+
+letexp ::= LET:e1 decs:e2 IN:e3 expseq:e4 END:e5 {: RESULT = new Leaf("letexp", "NULL"); RESULT.addChild(new Leaf("LET", e1)); RESULT.addChild(e2); RESULT.addChild(new Leaf("IN",e3)); RESULT.addChild(e4); RESULT.addChild(new Leaf("END",e5)); :}
+	;
+	
+decs ::= TYPE:e1 ID:e2 EQUAL:e3 ty:e4 decs:e5{: RESULT = new Leaf("decs", "NULL"); RESULT.addChild(new Leaf("TYPE", e1)); RESULT.addChild(new Leaf("ID",e2)); RESULT.addChild(new Leaf("EQUAL", e3)); RESULT.addChild(e4);  RESULT.addChild(e5); :}
+	| VAR:e1 ID:e2 ASSIGN:e3 exp:e4 decs:e5	{: RESULT = new Leaf("decs", "NULL"); RESULT.addChild(new Leaf("VAR", e1)); RESULT.addChild(new Leaf("ID",e2)); RESULT.addChild(new Leaf("ASSIGN", e3)); RESULT.addChild(e4); RESULT.addChild(e5); :} /*vardec*/
+	| VAR:e1 ID:e2 COLON:e3 typeid:e4 ASSIGN:e5 exp:e6 decs:e7  {: RESULT = new Leaf("decs", "NULL"); RESULT.addChild(new Leaf("VAR", e1)); RESULT.addChild(new Leaf("ID",e2)); RESULT.addChild(new Leaf("COLON", e3)); RESULT.addChild(e4); RESULT.addChild(new Leaf("ASSIGN",e5)); RESULT.addChild(e6); RESULT.addChild(e7); :}/*typeid será um tipo*/ /*vardec*/
+	| FUNCTION:e1 ID:e2 LPAR:e3 tyfields:e4 RPAR:e5 EQUAL:e6 exp:e7 decs:e8 {: RESULT = new Leaf("decs", "NULL"); RESULT.addChild(new Leaf("FUNCTION", "NULL")); RESULT.addChild(new Leaf("ID",e2)); RESULT.addChild(new Leaf("LPAR", e3)); RESULT.addChild(e4); RESULT.addChild(new Leaf("RPAR",e5)); RESULT.addChild(new Leaf("EQUAL",e6)); RESULT.addChild(e7); RESULT.addChild(e8);  :}	
+	| FUNCTION:e1 ID:e2 LPAR:e3 tyfields:e4 RPAR:e5 COLON:e6 typeid:e7 EQUAL:e8 exp:e9 decs:e10 {: RESULT = new Leaf("decs", "NULL"); RESULT.addChild(new Leaf("FUNCTION", "NULL")); RESULT.addChild(new Leaf("ID",e2)); RESULT.addChild(new Leaf("LPAR", e3)); RESULT.addChild(e4); RESULT.addChild(new Leaf("RPAR",e5)); RESULT.addChild(new Leaf("COLON",e6)); RESULT.addChild(e7); RESULT.addChild(new Leaf("EQUAL", e8));  RESULT.addChild(e9); RESULT.addChild(e10); :}	
+	| {: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
+
+ty ::= ID:e	{: RESULT = new Leaf("ty", "NULL"); RESULT.addChild(new Leaf("ID", e)); :}
+	| LKEY:e1 ID:e2 COLON:e3 typeid:e4 tyfields1:e5 RKEY:e6  {: RESULT = new Leaf("ty", "NULL"); RESULT.addChild(new Leaf("LKEY", e1)); RESULT.addChild(new Leaf("ID", e2)); RESULT.addChild(new Leaf("COLON",e3)); RESULT.addChild(e4); RESULT.addChild(e5); RESULT.addChild(new Leaf("RKEY", e6)); :}
+	| ARRAY_OF:e1 ID:e2 {:RESULT = new Leaf("ty", "NULL"); RESULT.addChild(new Leaf("ARRAY_OF", e1)); RESULT.addChild(new Leaf("ID", e2)); :}
+	;
+
+tyfields ::= ID:e1 COLON:e2 typeid:e3 tyfields1:e4	{: RESULT = new Leaf("tyfields", "NULL"); RESULT.addChild(new Leaf("ID", e1)); RESULT.addChild(new Leaf("COLON", e2)); RESULT.addChild(e3); RESULT.addChild(e4); :}
+	|	{: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
+
+tyfields1 ::= VIRG:e1 ID:e2 COLON:e3 typeid:e4 tyfields1:e5 {: RESULT = new Leaf("tyfields1", "NULL"); RESULT.addChild(new Leaf("VIRG", e1)); RESULT.addChild(new Leaf("ID", e2)); RESULT.addChild(new Leaf("COLON", e3)); RESULT.addChild(e4); RESULT.addChild(e5);:}
+	|	{: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
+
+
+expseq ::= exp:e1 expseq1:e2 {: RESULT =  new Leaf("expseq", "NULL"); RESULT.addChild(e1); RESULT.addChild(e2); :}
+	|	{: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
+
+expseq1 ::= SEMI:e1 exp:e2 expseq1:e3 {: RESULT = new Leaf("expseq1", "NULL"); RESULT.addChild(new Leaf("SEMI", e1)); RESULT.addChild(e2); RESULT.addChild(e3); :}
+	|	{: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
+
+
+typeid ::= ID:e {: RESULT =  new Leaf("typeid", "NULL"); RESULT.addChild(new Leaf("ID", e)); :}
+	;
+	
+
+idexps ::=  VIRG:e1 ID:e2 EQUAL:e3 exp:e4 idexps:e5 {: RESULT = new Leaf("idexps", "NULL"); RESULT.addChild(new Leaf("VIRG", e1)); RESULT.addChild(new Leaf("ID", e2)); RESULT.addChild(new Leaf("EQUAL", e3)); RESULT.addChild(e4); RESULT.addChild(e5); :}
+	| 	{: RESULT = new Leaf("EMPTY", "NULL"); :}
+	;
